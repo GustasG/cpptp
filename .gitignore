@@ -1,0 +1,16 @@
+# Visual Studio
+.vs/
+
+# Visual Studio Code
+.vscode/
+
+# JetBrains IDE
+.idea/
+
+# CMake
+cmake-build-debug/
+
+# Binary directories
+build/
+obj/
+bin/
