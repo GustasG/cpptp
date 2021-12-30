@@ -8,12 +8,12 @@ namespace cpptp
         m_WorkerThread = std::thread([this]{
             while (true)
             {
-                std::function<void()> task;
+                task_type task;
 
                 {
                     std::unique_lock<std::mutex> l(m_Mutex);
                     m_ConditionVariable.wait(l, [this]{
-                        return stopped() || !m_Tasks.empty();
+                        return !m_Tasks.empty() || stopped();
                     });
 
                     if (stopped() && m_Tasks.empty())

@@ -5,12 +5,12 @@
 namespace cpptp
 {
     ThreadPool::ThreadPool()
-            : m_Workers(std::thread::hardware_concurrency()), m_Count(0)
+        : m_Workers(std::thread::hardware_concurrency()), m_Count(0)
     {
     }
 
     ThreadPool::ThreadPool(std::size_t threadCount)
-            : m_Workers(threadCount), m_Count(0)
+        : m_Workers(threadCount), m_Count(0)
     {
     }
 

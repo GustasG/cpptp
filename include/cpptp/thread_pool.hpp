@@ -1,8 +1,9 @@
 #pragma once
 
 #include <atomic>
-#include <vector>
 #include <future>
+#include <vector>
+#include <type_traits>
 
 #include "cpptp/worker.hpp"
 

@@ -1,8 +1,8 @@
 #pragma once
 
-#include <atomic>
 #include <mutex>
 #include <queue>
+#include <atomic>
 #include <future>
 #include <memory>
 #include <thread>
@@ -15,6 +15,8 @@ namespace cpptp
     class Worker
     {
     public:
+        using task_type = std::function<void()>;
+
         Worker();
 
         Worker(const Worker&) = delete;
@@ -29,11 +31,6 @@ namespace cpptp
         template<class F, class ... Args>
         std::future<std::result_of_t<F(Args...)>> submit(F&& f, Args&& ... args)
         {
-            if (stopped())
-            {
-                throw std::runtime_error("Worker instance already been stopped");
-            }
-
             auto task = std::make_shared<std::packaged_task<std::result_of_t<F(Args...)>()>>([=] {
                 return f(args...);
             });
@@ -52,8 +49,8 @@ namespace cpptp
 
     private:
         std::mutex m_Mutex;
-        std::condition_variable_any m_ConditionVariable;
-        std::queue<std::function<void()>> m_Tasks;
+        std::condition_variable m_ConditionVariable;
+        std::queue<task_type> m_Tasks;
         std::thread m_WorkerThread;
         std::atomic<bool> m_Stopped;
     };

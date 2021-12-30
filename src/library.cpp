@@ -10,13 +10,16 @@ int main() {
 
     std::string s = "First";
 
-    tp.submit([](const std::string& text) {
+    auto t1 = tp.submit([](const std::string& text) {
         std::cout << "Hello, World!" << std::endl;
         std::cout << text << std::endl;
 
         std::cout << &text << std::endl;
+
+        return 42;
     }, s);
 
     std::cout << &s << std::endl;
     std::cout << sizeof(Worker) << std::endl;
+    std::cout << sizeof(Worker::task_type) << std::endl;
 }
