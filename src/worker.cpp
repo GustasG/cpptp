@@ -6,13 +6,13 @@ namespace cpptp
         : m_Stopped(false)
     {
         m_WorkerThread = std::thread([this]{
-			task_type task;
-			
+            task_type task;
+            
             while (true)
             {
                 {
                     std::unique_lock<std::mutex> l(m_Mutex);
-                    m_ConditionVariable.wait(l, [this]{
+                    m_ConditionVariable.wait(l, [this] {
                         return !m_Tasks.empty() || stopped();
                     });
 

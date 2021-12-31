@@ -9,9 +9,6 @@
 
 namespace cpptp
 {
-    /*
-     * Single producer thread pool
-     */
     class ThreadPool
     {
     public:
