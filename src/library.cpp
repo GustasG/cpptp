@@ -1,25 +1,46 @@
-#include "cpptp/cpptr.hpp"
-
 #include <string>
 #include <iostream>
+
+#include "cpptp/cpptr.hpp"
+
+static bool is_prime(size_t number) noexcept
+{
+    for (size_t i = 2; i <= static_cast<size_t>(sqrt(number)); i++)
+    {
+        if (number % i == 0)
+            return false;
+    }
+
+    return true;
+}
 
 using namespace cpptp;
 
 int main() {
     ThreadPool tp;
 
-    std::string s = "First";
+    std::vector<int> numbers {1, 2, 3, 4, 5};
 
-    auto t1 = tp.submit([](const std::string& text) {
-        std::cout << "Hello, World!" << std::endl;
-        std::cout << text << std::endl;
+    tp.for_each(numbers.begin(), numbers.end(), [] (int& value){
+       value *= 2;
+    });
 
-        std::cout << &text << std::endl;
+    tp.await();
 
-        return 42;
-    }, s);
+    std::cout << tp.pending_tasks() << std::endl;
 
-    std::cout << &s << std::endl;
-    std::cout << sizeof(Worker) << std::endl;
-    std::cout << sizeof(Worker::task_type) << std::endl;
+    for (const auto& number : numbers)
+    {
+        std::cout << number << std::endl;
+    }
+
+//    std::string m = "asas";
+//
+//    tp.execute([] (const std::string& v){
+//       std::cout << "Worker "<< &v << std::endl;
+//    }, m);
+//
+//    tp.await();
+//
+//    std::cout << &m << std::endl;
 }

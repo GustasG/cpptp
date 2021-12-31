@@ -15,6 +15,7 @@ namespace cpptp
     class Worker
     {
     public:
+        using size_type = std::size_t;
         using task_type = std::function<void()>;
 
         Worker();
@@ -27,12 +28,14 @@ namespace cpptp
     public:
         void stop() noexcept;
         bool stopped() const noexcept;
+        size_type pending_tasks() const;
+        void await();
 
         template<class F, class ... Args>
-        std::future<std::result_of_t<F(Args...)>> submit(F&& f, Args&& ... args)
+        std::future<std::result_of_t<F(Args...)>> submit(F&& function, Args&& ... args)
         {
             auto task = std::make_shared<std::packaged_task<std::result_of_t<F(Args...)>()>>([=] {
-                return f(args...);
+                return function(args...);
             });
 
             {
@@ -47,8 +50,22 @@ namespace cpptp
             return task->get_future();
         }
 
+        template<class F, class ... Args>
+        void execute(F&& function, Args&& ... args)
+        {
+            {
+                std::unique_lock<std::mutex> l(m_Mutex);
+
+                m_Tasks.emplace([=] {
+                    function(args...);
+                });
+            }
+
+            m_ConditionVariable.notify_one();
+        }
+
     private:
-        std::mutex m_Mutex;
+        mutable std::mutex m_Mutex;
         std::condition_variable m_ConditionVariable;
         std::queue<task_type> m_Tasks;
         std::thread m_WorkerThread;

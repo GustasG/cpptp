@@ -16,7 +16,7 @@ namespace cpptp
                         return !m_Tasks.empty() || stopped();
                     });
 
-                    if (stopped() && m_Tasks.empty())
+                    if (m_Tasks.empty() && stopped())
                     {
                         break;
                     }
@@ -25,7 +25,8 @@ namespace cpptp
                     m_Tasks.pop();
                 }
 
-               task();
+                task();
+                m_ConditionVariable.notify_one();
             }
         });
     }
@@ -45,5 +46,19 @@ namespace cpptp
     bool Worker::stopped() const noexcept
     {
         return m_Stopped.load(std::memory_order_acquire);
+    }
+
+    Worker::size_type Worker::pending_tasks() const
+    {
+        std::unique_lock<std::mutex> l(m_Mutex);
+        return m_Tasks.size();
+    }
+
+    void Worker::await()
+    {
+        std::unique_lock<std::mutex> l(m_Mutex);
+        m_ConditionVariable.wait(l, [this]{
+           return m_Tasks.empty();
+        });
     }
 } // namespace cpptp

@@ -1,6 +1,7 @@
 #include "cpptp/cpptr.hpp"
 
 #include <thread>
+#include <numeric>
 
 namespace cpptp
 {
@@ -9,9 +10,26 @@ namespace cpptp
     {
     }
 
-    ThreadPool::ThreadPool(std::size_t threadCount)
+    ThreadPool::ThreadPool(size_type threadCount)
         : m_Workers(threadCount), m_Count(0)
     {
+    }
+
+    ThreadPool::size_type ThreadPool::workers() const noexcept
+    {
+        return m_Workers.size();
+    }
+
+    ThreadPool::size_type ThreadPool::pending_tasks() const noexcept
+    {
+        size_type pending = 0;
+
+        for (const auto& worker : m_Workers)
+        {
+            pending += worker.pending_tasks();
+        }
+
+        return pending;
     }
 
     void ThreadPool::stop()
@@ -19,6 +37,14 @@ namespace cpptp
         for (auto& worker : m_Workers)
         {
             worker.stop();
+        }
+    }
+
+    void ThreadPool::await()
+    {
+        for (auto& worker : m_Workers)
+        {
+            worker.await();
         }
     }
 } // namespace cpptp
