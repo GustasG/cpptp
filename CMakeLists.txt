@@ -1,15 +1,15 @@
-cmake_minimum_required(VERSION 3.21)
-project(cpptp)
+cmake_minimum_required(VERSION 3.10)
+
+project(cpptp VERSION 1.0.0 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 11)
 
-include_directories(include)
-include_directories(src)
+find_package(Threads REQUIRED)
 
-file(GLOB SRC_FILES
-        src/library.cpp
-        src/worker.cpp          include/cpptp/worker.hpp
+file(GLOB CPPTP_FILES
+                                include/cpptp/cpptp.hpp
         src/thread_pool.cpp     include/cpptp/thread_pool.hpp
-                                include/cpptp/detail/mutex.hpp)
+        src/worker.cpp          include/cpptp/worker.hpp)
 
-add_executable(${PROJECT_NAME} ${SRC_FILES})
+add_library(${PROJECT_NAME} ${CPPTP_FILES} ${CMAKE_THREAD_LIBS_INIT})
+target_include_directories(${PROJECT_NAME} PUBLIC include)

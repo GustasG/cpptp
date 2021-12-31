@@ -30,27 +30,27 @@ namespace cpptp
         void await();
 
         template<class F, class ... Args>
-        std::future<std::result_of_t<F(Args...)>> submit(F&& f, Args&& ... args)
+        std::future<std::result_of_t<F(Args...)>> submit(F&& function, Args&& ... args)
         {
             auto index = m_Count.fetch_add(1, std::memory_order_relaxed) % workers();
 
-            return m_Workers[index].submit(std::forward<F>(f), std::forward<Args>(args)...);
+            return m_Workers[index].submit(std::forward<F>(function), std::forward<Args>(args)...);
         }
 
         template<class F, class ... Args>
-        void execute(F&& f, Args&& ... args)
+        void execute(F&& function, Args&& ... args)
         {
             auto index = m_Count.fetch_add(1, std::memory_order_relaxed) % workers();
 
-            m_Workers[index].execute(std::forward<F>(f), std::forward<Args>(args)...);
+            m_Workers[index].execute(std::forward<F>(function), std::forward<Args>(args)...);
         }
 
         template<class InputIt, class UnaryFunction>
-        void for_each(InputIt first, InputIt last, UnaryFunction f)
+        void for_each(InputIt first, InputIt last, UnaryFunction function)
         {
             for (; first != last; ++first)
             {
-                execute(f, std::ref(*first));
+                execute(function, std::ref(*first));
             }
         }
 
