@@ -32,7 +32,7 @@ namespace cpptp
         void await();
 
         template<class F, class... Args>
-        std::future<std::result_of_t<F(Args...)>> submit(F&& function, Args&&... args)
+        std::future<std::invoke_result_t<F(Args...)>> submit(F&& function, Args&&... args)
         {
             auto task = std::make_shared<std::packaged_task<std::result_of_t<F(Args...)>()>>([=] {
                 return function(args...);
