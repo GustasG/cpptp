@@ -27,8 +27,8 @@ namespace cpptp
 
     public:
         void stop() noexcept;
-        bool stopped() const noexcept;
-        size_type pending_tasks() const;
+        [[nodiscard]] bool stopped() const noexcept;
+        [[nodiscard]] size_type pending_tasks() const;
         void await();
 
         template<class F, class... Args>

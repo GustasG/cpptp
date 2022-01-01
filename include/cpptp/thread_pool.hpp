@@ -21,8 +21,8 @@ namespace cpptp
         ThreadPool& operator=(const ThreadPool&) = delete;
 
     public:
-        size_type workers() const noexcept;
-        size_type pending_tasks() const noexcept;
+        [[nodiscard]] size_type workers() const noexcept;
+        [[nodiscard]] size_type pending_tasks() const noexcept;
         void stop();
         void await();
 
