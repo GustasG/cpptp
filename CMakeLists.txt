@@ -2,9 +2,15 @@ cmake_minimum_required(VERSION 3.10)
 
 project(cpptp VERSION 1.0.0 LANGUAGES CXX)
 
+option(CPPTP_ENABLE_EXCEPTIONS "Enable throwing exceptions on errors" ON)
+
 set(CMAKE_CXX_STANDARD 17)
 
 find_package (Threads REQUIRED)
+
+if (CPPTP_ENABLE_EXCEPTIONS)
+    add_compile_definitions(CPPTP_ENABLE_EXCEPTIONS)
+endif()
 
 file(GLOB CPPTP_FILES
                                 include/cpptp/cpptp.hpp
