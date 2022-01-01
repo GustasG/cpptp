@@ -19,7 +19,7 @@ namespace cpptp
         return m_Workers.size();
     }
 
-    ThreadPool::size_type ThreadPool::pending_tasks() const noexcept
+    ThreadPool::size_type ThreadPool::pending_tasks() const
     {
         size_type pending = 0;
 
@@ -31,7 +31,7 @@ namespace cpptp
         return pending;
     }
 
-    void ThreadPool::stop()
+    void ThreadPool::stop() noexcept
     {
         for (auto& worker : m_Workers)
         {

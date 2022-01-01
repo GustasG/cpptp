@@ -60,12 +60,13 @@ namespace cpptp
          * @param function Callable instance that needs to be executed
          * @param args Arguments passed to given callable
          * @return future of executing provided callable with arguments
+         * @throws std::runtime_error if raising exceptions are enabled and worker has been stopped
          * @see execute
          */
         template<class F, class... Args>
-        std::future<std::invoke_result_t<F(Args...)>> submit(F&& function, Args&&... args)
+        std::future<std::invoke_result_t<F, Args...>> submit(F&& function, Args&&... args)
         {
-            auto task = std::make_shared<std::packaged_task<std::result_of_t<F(Args...)>()>>([=] {
+            auto task = std::make_shared<std::packaged_task<std::invoke_result_t<F, Args...>()>>([=] {
                 return function(args...);
             });
 
@@ -93,6 +94,7 @@ namespace cpptp
          * Since this method does not create future it is more preferable to use than submit if result is unnecessary
          * @param function Callable instance that needs to be executed
          * @param args Arguments passed to given callable
+         * @throws std::runtime_error if raising exceptions are enabled and worker has been stopped
          * @see submit
          */
         template<class F, class... Args>

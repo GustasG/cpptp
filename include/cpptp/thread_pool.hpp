@@ -40,12 +40,12 @@ namespace cpptp
          * Retrieves approximate number of tasks that workers have remaining
          * @return Approximate result of pending tasks
          */
-        [[nodiscard]] size_type pending_tasks() const noexcept;
+        [[nodiscard]] size_type pending_tasks() const;
 
         /**
          * Forces all workers to deny new tasks and finish with pending ones
          */
-        void stop();
+        void stop() noexcept;
 
         /**
          * Blocks until there are no more tasks waiting to be executed for all workers.
@@ -60,6 +60,7 @@ namespace cpptp
          * @param function Callable instance that needs to be executed
          * @param args Arguments passed to given callable
          * @return future of executing provided callable with arguments
+         * @throws std::runtime_error if raising exceptions are enabled and pool has been stopped
          * @see execute
          */
         template<class F, class... Args>
@@ -76,6 +77,7 @@ namespace cpptp
          * Since this method does not create future it is more preferable to use than submit if result is unnecessary
          * @param function Callable instance that needs to be executed
          * @param args Arguments passed to given callable
+         * @throws std::runtime_error if raising exceptions are enabled and pool has been stopped
          * @see submit
          */
         template<class F, class... Args>
