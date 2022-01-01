@@ -1,7 +1,7 @@
 # cpptp
 
 [![CodeQL](https://github.com/GustasG/cpptp/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/GustasG/cpptp/actions/workflows/codeql-analysis.yml)
-[![.github/workflows/Test.yml](https://github.com/GustasG/cpptp/actions/workflows/Test.yml/badge.svg)](https://github.com/GustasG/cpptp/actions/workflows/Test.yml)
+[![CMake](https://github.com/GustasG/cpptp/actions/workflows/cmake.yml/badge.svg)](https://github.com/GustasG/cpptp/actions/workflows/cmake.yml)
 [![Language grade: C/C++](https://img.shields.io/lgtm/grade/cpp/g/GustasG/cpptp.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/GustasG/cpptp/context:cpp)
 [![Total alerts](https://img.shields.io/lgtm/alerts/g/GustasG/cpptp.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/GustasG/cpptp/alerts/)
 [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/GustasG/cpptp/master/LICENSE)
