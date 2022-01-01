@@ -1,3 +1,5 @@
+#include <exception>
+
 #include <gtest/gtest.h>
 
 #include <cpptp/worker.hpp>
