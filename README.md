@@ -15,7 +15,7 @@ Simple usage example:
 cpptp::ThreadPool pool;
 
 // Submit task to pool for execution and return future for executed result
-auto t1 = pool.submit([] {
+std::future<int> t1 = pool.submit([] {
    std::this_thread::sleep_for(std::chrono::seconds(2));
    return 20;
 });
