@@ -1,7 +1,6 @@
 #include "cpptp/cpptp.hpp"
 
 #include <thread>
-#include <numeric>
 
 namespace cpptp
 {

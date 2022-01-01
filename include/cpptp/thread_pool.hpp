@@ -18,7 +18,7 @@ namespace cpptp
         explicit ThreadPool(size_type threadCount);
 
         ThreadPool(const ThreadPool&) = delete;
-        ThreadPool& operator= (const ThreadPool&) = delete;
+        ThreadPool& operator=(const ThreadPool&) = delete;
 
     public:
         size_type workers() const noexcept;
@@ -26,16 +26,16 @@ namespace cpptp
         void stop();
         void await();
 
-        template<class F, class ... Args>
-        std::future<std::result_of_t<F(Args...)>> submit(F&& function, Args&& ... args)
+        template<class F, class... Args>
+        std::future<std::result_of_t<F(Args...)>> submit(F&& function, Args&&... args)
         {
             auto index = m_Count.fetch_add(1, std::memory_order_relaxed) % workers();
 
             return m_Workers[index].submit(std::forward<F>(function), std::forward<Args>(args)...);
         }
 
-        template<class F, class ... Args>
-        void execute(F&& function, Args&& ... args)
+        template<class F, class... Args>
+        void execute(F&& function, Args&&... args)
         {
             auto index = m_Count.fetch_add(1, std::memory_order_relaxed) % workers();
 

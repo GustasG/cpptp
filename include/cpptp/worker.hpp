@@ -21,7 +21,7 @@ namespace cpptp
         Worker();
 
         Worker(const Worker&) = delete;
-        Worker& operator= (const Worker&) = delete;
+        Worker& operator=(const Worker&) = delete;
 
         ~Worker();
 
@@ -31,8 +31,8 @@ namespace cpptp
         size_type pending_tasks() const;
         void await();
 
-        template<class F, class ... Args>
-        std::future<std::result_of_t<F(Args...)>> submit(F&& function, Args&& ... args)
+        template<class F, class... Args>
+        std::future<std::result_of_t<F(Args...)>> submit(F&& function, Args&&... args)
         {
             auto task = std::make_shared<std::packaged_task<std::result_of_t<F(Args...)>()>>([=] {
                 return function(args...);
@@ -50,8 +50,8 @@ namespace cpptp
             return task->get_future();
         }
 
-        template<class F, class ... Args>
-        void execute(F&& function, Args&& ... args)
+        template<class F, class... Args>
+        void execute(F&& function, Args&&... args)
         {
             {
                 std::unique_lock<std::mutex> l(m_Mutex);

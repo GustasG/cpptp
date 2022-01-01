@@ -1,7 +1,8 @@
 project "cpptp"
+	language "C++"
+	cppdialect "C++11"
     kind "StaticLib"
-    language "C++"
-    cppdialect "C++11"
+	warnings "Everything"
 
     includedirs
     {
