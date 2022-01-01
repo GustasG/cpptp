@@ -6,7 +6,7 @@ option(CPPTP_ENABLE_EXCEPTIONS "Enable throwing exceptions on errors" ON)
 
 set(CMAKE_CXX_STANDARD 17)
 
-find_package (Threads REQUIRED)
+find_package(Threads REQUIRED)
 
 if (CPPTP_ENABLE_EXCEPTIONS)
     add_compile_definitions(CPPTP_ENABLE_EXCEPTIONS)
@@ -19,4 +19,4 @@ file(GLOB CPPTP_FILES
 
 add_library(${PROJECT_NAME} ${CPPTP_FILES})
 target_include_directories(${PROJECT_NAME} PUBLIC include)
-target_link_libraries(${PROJECT_NAME}  ${CMAKE_THREAD_LIBS_INIT})
+target_link_libraries(${PROJECT_NAME} ${CMAKE_THREAD_LIBS_INIT})
