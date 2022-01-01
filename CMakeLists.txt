@@ -11,5 +11,6 @@ file(GLOB CPPTP_FILES
         src/thread_pool.cpp     include/cpptp/thread_pool.hpp
         src/worker.cpp          include/cpptp/worker.hpp)
 
-add_library(${PROJECT_NAME} ${CPPTP_FILES} ${CMAKE_THREAD_LIBS_INIT})
+add_library(${PROJECT_NAME} ${CPPTP_FILES})
 target_include_directories(${PROJECT_NAME} PUBLIC include)
+target_link_libraries(${PROJECT_NAME}  ${CMAKE_THREAD_LIBS_INIT})
