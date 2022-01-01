@@ -18,3 +18,9 @@ project "cpptp"
         "src/thread_pool.cpp",
         "src/worker.cpp"
     }
+
+    filter "system:linux"
+        links
+        {
+            "pthread"
+        }
