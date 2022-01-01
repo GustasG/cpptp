@@ -28,7 +28,7 @@ TEST(WorkerTest, WorkerExecutionTestThatThrowsException) {
 
     EXPECT_NO_THROW({
         worker.execute([]{
-            throw std::exception("Example exception");
+            throw std::runtime_error("Example exception");
         });
 
         worker.await();
@@ -50,10 +50,10 @@ TEST(WorkerTest, WorkerSubmitionTestThatThrowsException) {
     cpptp::Worker worker;
 
     auto future = worker.submit([] {
-       throw std::exception("Example exception");
+       throw std::runtime_error("Example exception");
     });
 
-    EXPECT_THROW(future.get(), std::exception);
+    EXPECT_THROW(future.get(), std::runtime_error);
 }
 
 TEST(WorkerTest, WorkerSubmitionAndPendingTasksRetrieval) {
