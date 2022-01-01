@@ -14,4 +14,4 @@ extraction:
         - mkdir build
         - cmake -S . -B build
     index:
-      build_command: cmake --build -j2
+      build_command: cmake --build ./build -j4
