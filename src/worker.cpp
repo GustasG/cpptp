@@ -11,7 +11,7 @@ namespace cpptp
             while (true)
             {
                 {
-                    std::unique_lock l(m_Mutex);
+                    std::unique_lock<std::mutex> l(m_Mutex);
                     m_ConditionVariable.wait(l, [this] {
                         return !m_Tasks.empty() || stopped();
                     });
@@ -50,13 +50,13 @@ namespace cpptp
 
     Worker::size_type Worker::pending_tasks() const
     {
-        std::unique_lock l(m_Mutex);
+        std::lock_guard<std::mutex> l(m_Mutex);
         return m_Tasks.size();
     }
 
     void Worker::await()
     {
-        std::unique_lock l(m_Mutex);
+        std::unique_lock<std::mutex> l(m_Mutex);
         m_ConditionVariable.wait(l, [this] {
             return m_Tasks.empty();
         });

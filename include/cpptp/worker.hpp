@@ -7,7 +7,6 @@
 #include <memory>
 #include <thread>
 #include <functional>
-#include <type_traits>
 #include <condition_variable>
 
 namespace cpptp
@@ -63,19 +62,19 @@ namespace cpptp
          * @throws std::runtime_error if raising exceptions are enabled and worker has been stopped
          * @see execute
          */
+
+        // std::future<std::invoke_result_t<F, Args...>>
         template<class F, class... Args>
-        std::future<std::invoke_result_t<F, Args...>> submit(F&& function, Args&&... args)
+        auto submit(F&& function, Args&&... args) -> std::future<decltype(function(args...))>
         {
-            auto task = std::make_shared<std::packaged_task<std::invoke_result_t<F, Args...>()>>([=] {
-                return function(args...);
-            });
+            auto task = std::make_shared<std::packaged_task<decltype(function(args...))()>>(std::forward<F>(function));
 
             if (!stopped())
             {
-                std::unique_lock l(m_Mutex);
+                std::lock_guard<std::mutex> l(m_Mutex);
 
                 m_Tasks.emplace([=] {
-                    (*task)();
+                    (*task)(args...);
                 });
             }
 #if defined(CPPTP_ENABLE_EXCEPTIONS)
@@ -111,7 +110,7 @@ namespace cpptp
 
             if (!stopped())
             {
-                std::unique_lock l(m_Mutex);
+                std::lock_guard<std::mutex> l(m_Mutex);
 
                 m_Tasks.emplace(fn);
             }

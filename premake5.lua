@@ -1,6 +1,6 @@
 project "cpptp"
     language "C++"
-    cppdialect "C++17"
+    cppdialect "C++11"
     kind "StaticLib"
     warnings "Everything"
 
