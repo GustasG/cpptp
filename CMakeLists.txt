@@ -1,11 +1,11 @@
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.11)
 
 project(cpptp VERSION 1.0.0 LANGUAGES CXX)
 
 option(CPPTP_ENABLE_EXCEPTIONS "Enable exception throwing on errors" ON)
 option(CPPTP_ENABLE_TEST_RUNNING "Run project tests" OFF)
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 find_package(Threads REQUIRED)

@@ -3,7 +3,6 @@
 #include <atomic>
 #include <future>
 #include <vector>
-#include <type_traits>
 
 #include "cpptp/worker.hpp"
 
@@ -64,7 +63,7 @@ namespace cpptp
          * @see execute
          */
         template<class F, class... Args>
-        std::future<std::invoke_result_t<F, Args...>> submit(F&& function, Args&&... args)
+        auto submit(F&& function, Args&&... args) -> std::future<decltype(function(args...))>
         {
             auto index = m_Count.fetch_add(1, std::memory_order_relaxed) % workers();
 
