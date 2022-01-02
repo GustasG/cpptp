@@ -62,8 +62,6 @@ namespace cpptp
          * @throws std::runtime_error if raising exceptions are enabled and worker has been stopped
          * @see execute
          */
-
-        // std::future<std::invoke_result_t<F, Args...>>
         template<class F, class... Args>
         auto submit(F&& function, Args&&... args) -> std::future<decltype(function(args...))>
         {
