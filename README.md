@@ -1,5 +1,6 @@
 # cpptp
 
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/7ccac52754ad4af5b25be87eb8cf2d29)](https://app.codacy.com/gh/GustasG/cpptp?utm_source=github.com&utm_medium=referral&utm_content=GustasG/cpptp&utm_campaign=Badge_Grade_Settings)
 [![CodeQL](https://github.com/GustasG/cpptp/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/GustasG/cpptp/actions/workflows/codeql-analysis.yml)
 [![CMake](https://github.com/GustasG/cpptp/actions/workflows/cmake.yml/badge.svg)](https://github.com/GustasG/cpptp/actions/workflows/cmake.yml)
 [![Language grade: C/C++](https://img.shields.io/lgtm/grade/cpp/g/GustasG/cpptp.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/GustasG/cpptp/context:cpp)
