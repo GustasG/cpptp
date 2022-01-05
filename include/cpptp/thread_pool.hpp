@@ -5,6 +5,7 @@
 #include <vector>
 
 #include "cpptp/worker.hpp"
+#include "cpptp/utility.hpp"
 
 namespace cpptp
 {
@@ -63,7 +64,7 @@ namespace cpptp
          * @see execute
          */
         template<class F, class... Args>
-        auto submit(F&& function, Args&&... args) -> std::future<decltype(function(args...))>
+        std::future<return_type_t<F, Args...>> submit(F&& function, Args&&... args)
         {
             auto index = m_Count.fetch_add(1, std::memory_order_relaxed) % workers();
 

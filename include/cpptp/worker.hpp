@@ -9,6 +9,8 @@
 #include <functional>
 #include <condition_variable>
 
+#include "cpptp/utility.hpp"
+
 namespace cpptp
 {
     class Worker
@@ -63,16 +65,18 @@ namespace cpptp
          * @see execute
          */
         template<class F, class... Args>
-        auto submit(F&& function, Args&&... args) -> std::future<decltype(function(args...))>
+        std::future<return_type_t<F, Args...>> submit(F&& function, Args&&... args)
         {
-            auto task = std::make_shared<std::packaged_task<decltype(function(args...))()>>(std::forward<F>(function));
+            auto task = std::make_shared<std::packaged_task<return_type_t<F, Args...>()>>([=] {
+                return function(args...);
+            });
 
             if (!stopped())
             {
                 std::lock_guard<std::mutex> l(m_Mutex);
 
                 m_Tasks.emplace([=] {
-                    (*task)(args...);
+                    (*task)();
                 });
             }
 #if defined(CPPTP_ENABLE_EXCEPTIONS)

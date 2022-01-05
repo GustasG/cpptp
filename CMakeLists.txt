@@ -25,9 +25,14 @@ if (CPPTP_ENABLE_TEST_RUNNING)
     add_subdirectory(test)
 endif()
 
-file(GLOB CPPTP_FILES
+if(MSVC)
+    string(APPEND CMAKE_CXX_FLAGS "/Zc:__cplusplus")
+endif()
+
+set(CPPTP_FILES
                                 include/cpptp/cpptp.hpp
         src/thread_pool.cpp     include/cpptp/thread_pool.hpp
+                                include/cpptp/utility.hpp
         src/worker.cpp          include/cpptp/worker.hpp)
 
 add_library(${PROJECT_NAME} STATIC ${CPPTP_FILES})
