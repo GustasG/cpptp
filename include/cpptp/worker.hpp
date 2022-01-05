@@ -7,9 +7,9 @@
 #include <memory>
 #include <thread>
 #include <functional>
+#include <type_traits>
 #include <condition_variable>
 
-#include "cpptp/utility.hpp"
 
 namespace cpptp
 {
@@ -65,10 +65,10 @@ namespace cpptp
          * @see execute
          */
         template<class F, class... Args>
-        std::future<return_type_t<F, Args...>> submit(F&& function, Args&&... args)
+        std::future<std::invoke_result_t<F, Args...>> submit(F&& function, Args&&... args)
         {
-            auto task = std::make_shared<std::packaged_task<return_type_t<F, Args...>()>>([=] {
-                return function(args...);
+            auto task = std::make_shared<std::packaged_task<std::invoke_result_t<F, Args...>()>>([=] {
+                return std::invoke(function, args...);
             });
 
             if (!stopped())

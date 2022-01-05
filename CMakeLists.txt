@@ -5,7 +5,7 @@ project(cpptp VERSION 1.0.0 LANGUAGES CXX)
 option(CPPTP_ENABLE_EXCEPTIONS "Enable exception throwing on errors" ON)
 option(CPPTP_ENABLE_TEST_RUNNING "Run project tests" OFF)
 
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 find_package(Threads REQUIRED)
@@ -32,7 +32,6 @@ endif()
 set(CPPTP_FILES
                                 include/cpptp/cpptp.hpp
         src/thread_pool.cpp     include/cpptp/thread_pool.hpp
-                                include/cpptp/utility.hpp
         src/worker.cpp          include/cpptp/worker.hpp)
 
 add_library(${PROJECT_NAME} STATIC ${CPPTP_FILES})

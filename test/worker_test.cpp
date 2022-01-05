@@ -68,6 +68,23 @@ TEST(WorkerTest, WorkerSubmitionAndPendingTasksRetrieval) {
     ASSERT_EQ(worker.pending_tasks(), 0);
 }
 
+TEST(WorkerTest, WorkerSubmitionWithClassInstance) {
+    struct Foo
+    {
+        int bar()
+        {
+            return 50;
+        }
+    };
+
+    cpptp::Worker worker;
+    Foo f;
+
+    auto future = worker.submit(&Foo::bar, &f);
+
+    ASSERT_EQ(future.get(), 50);
+}
+
 TEST(WorkerTest, WorkerSubmitionAfterStop) {
     cpptp::Worker worker;
     worker.stop();
