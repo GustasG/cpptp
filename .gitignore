@@ -1,0 +1,20 @@
+# Visual Studio
+.vs/
+*.sln
+*.vcxproj
+*.filters
+*.user
+
+# Visual Studio Code
+.vscode/
+
+# JetBrains IDE
+.idea/
+
+# CMake
+cmake-build-debug/
+
+# Binary directories
+build/
+obj/
+bin/

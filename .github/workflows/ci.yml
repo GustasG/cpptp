@@ -1,0 +1,55 @@
+name: ci
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  Test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+
+      matrix:
+        os:
+          - ubuntu-20.04
+          - macos-11
+          - windows-2022
+        compiler:
+          - gcc-11
+          - llvm-13.0.0
+        build_type:
+          - Debug
+          - Release
+
+        include:
+          - os: windows-2022
+            compiler: msvc
+            build_type: Debug
+
+          - os: windows-2022
+            compiler: msvc
+            build_type: Release
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Setup Cpp
+        uses: aminya/setup-cpp@v1
+        with:
+          compiler: ${{ matrix.compiler }}
+          vcvarsall: ${{ contains(matrix.os, 'windows' )}}
+          cmake: true
+
+      - name: Configure CMake
+        run: cmake -B ./build -DCMAKE_BUILD_TYPE=${{matrix.build_type}} -DCPPTP_RUN_TESTS=ON
+
+      - name: Build
+        run: cmake --build ./build --config ${{matrix.build_type}} -j 8
+
+      - name: Run Tests
+        working-directory: ./build
+        run: ctest -C ${{matrix.build_type}}

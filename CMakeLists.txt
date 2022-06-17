@@ -1,0 +1,40 @@
+cmake_minimum_required(VERSION 3.11)
+
+project(cpptp
+        VERSION 1.0.0
+        DESCRIPTION "C++ Thread Pool"
+        HOMEPAGE_URL "https://github.com/GustasG/cpptp"
+        LANGUAGES CXX)
+
+option(CPPTP_DISABLE_EXCEPTIONS "Disable exception throwing" OFF)
+option(CPPTP_RUN_TESTS "Run tests" OFF)
+
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED TRUE)
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+
+find_package(Threads REQUIRED)
+
+include(FetchContent)
+
+if (CPPTP_DISABLE_EXCEPTIONS)
+    add_compile_definitions(CPPTP_DISABLE_EXCEPTIONS)
+endif()
+
+add_library(${PROJECT_NAME} STATIC
+                                include/cpptp/cpptp.hpp
+        src/thread_pool.cpp     include/cpptp/thread_pool.hpp
+        src/worker.cpp          include/cpptp/worker.hpp)
+
+target_include_directories(${PROJECT_NAME} PUBLIC include)
+target_link_libraries(${PROJECT_NAME} ${CMAKE_THREAD_LIBS_INIT})
+
+if (CPPTP_RUN_TESTS)
+    FetchContent_Declare(googletest URL https://github.com/google/googletest/archive/refs/tags/release-1.11.0.zip)
+    # For Windows: Prevent overriding the parent project's compiler/linker settings
+    set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+    FetchContent_MakeAvailable(googletest)
+
+    enable_testing()
+    add_subdirectory(test)
+endif()
