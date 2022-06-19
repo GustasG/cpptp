@@ -7,7 +7,7 @@ namespace cpptp
     }
 
     Worker::Worker()
-        : m_Stopped(false)
+        : m_Stopped(false), m_Consumed(0)
     {
         m_WorkerThread = std::thread([this] {
             while (!stopped() || pending_task_count() != 0)
@@ -16,6 +16,7 @@ namespace cpptp
                 m_Tasks.wait_dequeue(task);
 
                 task();
+                m_Consumed.fetch_sub(1, std::memory_order_acq_rel);
                 m_WaitingCv.notify_all();
             }
         });
@@ -47,7 +48,7 @@ namespace cpptp
     {
         std::unique_lock l(m_WaitingMutex);
         m_WaitingCv.wait(l, [this] {
-            return pending_task_count() == 0;
+            return m_Consumed.load(std::memory_order_acquire) == 0;
         });
     }
 } // namespace cpptp

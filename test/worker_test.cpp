@@ -34,8 +34,6 @@ TEST(WorkerTest, WorkerExecutionTestThatThrowsException) {
             throw std::runtime_error("Example exception");
         });
     });
-
-    worker.wait();
 }
 
 TEST(WorkerTest, WorkerExecutionAfterStop) {

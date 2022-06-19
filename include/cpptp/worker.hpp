@@ -78,6 +78,8 @@ namespace cpptp
                 m_Tasks.enqueue([=, task_args = std::move(task_args)] () mutable {
                     std::apply(*task, task_args);
                 });
+
+                m_Consumed.fetch_add(1, std::memory_order_release);
             }
 #if !defined(CPPTP_DISABLE_EXCEPTIONS)
             else
@@ -114,6 +116,8 @@ namespace cpptp
                     {
                     }
                 });
+
+                m_Consumed.fetch_add(1, std::memory_order_release);
             }
 #if !defined(CPPTP_DISABLE_EXCEPTIONS)
             else
@@ -128,6 +132,7 @@ namespace cpptp
         std::condition_variable m_WaitingCv;
         moodycamel::BlockingConcurrentQueue<task_type> m_Tasks;
         std::thread m_WorkerThread;
+        std::atomic<size_type> m_Consumed;
         std::atomic<bool> m_Stopped;
     };
 } // namespace cpptp
