@@ -38,8 +38,7 @@ namespace cpptp
 
         for (const auto& worker : m_Workers)
         {
-            pending +=
-                worker->pending_task_count();
+            pending += worker->pending_task_count();
         }
 
         return pending;
