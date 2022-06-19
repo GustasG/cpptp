@@ -2,30 +2,21 @@
 
 namespace cpptp
 {
+    static void dummy_task()
+    {
+    }
+
     Worker::Worker()
         : m_Stopped(false)
     {
         m_WorkerThread = std::thread([this] {
-            task_type task;
-
-            while (true)
+            while (!stopped() || pending_task_count() != 0)
             {
-                {
-                    std::unique_lock<std::mutex> l(m_Mutex);
-                    m_ConditionVariable.wait(l, [this] {
-                        return !m_Tasks.empty() || stopped();
-                    });
-
-                    if (m_Tasks.empty() && stopped())
-                    {
-                        break;
-                    }
-
-                    task = std::move(m_Tasks.front());
-                    m_Tasks.pop();
-                }
+                task_type task;
+                m_Tasks.wait_dequeue(task);
 
                 task();
+                m_WaitingCv.notify_all();
             }
         });
     }
@@ -33,13 +24,13 @@ namespace cpptp
     Worker::~Worker()
     {
         stop();
+        m_Tasks.enqueue(dummy_task);
         m_WorkerThread.join();
     }
 
     void Worker::stop() noexcept
     {
         m_Stopped.store(true, std::memory_order_release);
-        m_ConditionVariable.notify_all();
     }
 
     bool Worker::stopped() const noexcept
@@ -49,7 +40,14 @@ namespace cpptp
 
     Worker::size_type Worker::pending_task_count() const
     {
-        std::lock_guard l(m_Mutex);
-        return m_Tasks.size();
+        return m_Tasks.size_approx();
+    }
+
+    void Worker::wait()
+    {
+        std::unique_lock l(m_WaitingMutex);
+        m_WaitingCv.wait(l, [this] {
+            return pending_task_count() == 0;
+        });
     }
 } // namespace cpptp

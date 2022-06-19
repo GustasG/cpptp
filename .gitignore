@@ -12,9 +12,11 @@
 .idea/
 
 # CMake
-cmake-build-debug/
+cmake-build-*/
+CMakeSettings.json
 
 # Binary directories
-build/
-obj/
 bin/
+obj/
+build/
+out/

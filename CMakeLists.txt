@@ -7,8 +7,8 @@ project(cpptp
     LANGUAGES CXX
 )
 
-option(CPPTP_DISABLE_EXCEPTIONS "Disable exception throwing" OFF)
 option(CPPTP_RUN_TESTS "Run tests" OFF)
+option(CPPTP_DISABLE_EXCEPTIONS "Disable exception throwing" OFF)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED TRUE)
@@ -18,8 +18,10 @@ find_package(Threads REQUIRED)
 
 include(FetchContent)
 
+add_subdirectory(libs/concurrentqueue)
+
 if (CPPTP_DISABLE_EXCEPTIONS)
-    add_compile_definitions(CPPTP_DISABLE_EXCEPTIONS)
+    target_compile_definitions(${PROJECT_NAME} CPPTP_DISABLE_EXCEPTIONS)
 endif()
 
 add_library(${PROJECT_NAME} STATIC
@@ -29,7 +31,11 @@ add_library(${PROJECT_NAME} STATIC
 )
 
 target_include_directories(${PROJECT_NAME} PUBLIC include)
-target_link_libraries(${PROJECT_NAME} ${CMAKE_THREAD_LIBS_INIT})
+
+target_link_libraries(${PROJECT_NAME}
+    ${CMAKE_THREAD_LIBS_INIT}
+    concurrentqueue
+)
 
 if (CPPTP_RUN_TESTS)
     enable_testing()

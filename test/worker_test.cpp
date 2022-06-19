@@ -1,5 +1,5 @@
-#include <exception>
 #include <chrono>
+#include <exception>
 
 #include <gtest/gtest.h>
 
@@ -21,7 +21,7 @@ TEST(WorkerTest, WorkerExecutionTest) {
         value -= 10;
     });
 
-    std::this_thread::sleep_for(2s);
+    worker.wait();
 
     ASSERT_EQ(value, 40);
 }
@@ -35,7 +35,7 @@ TEST(WorkerTest, WorkerExecutionTestThatThrowsException) {
         });
     });
 
-    std::this_thread::sleep_for(1s);
+    worker.wait();
 }
 
 TEST(WorkerTest, WorkerExecutionAfterStop) {
@@ -63,7 +63,6 @@ TEST(WorkerTest, WorkerSubmitionAndPendingTasksRetrieval) {
     cpptp::Worker worker;
 
     auto future = worker.submit([] {
-        std::this_thread::sleep_for(1s);
     });
 
     future.get();
@@ -106,7 +105,6 @@ TEST(WorkerTest, WorkerSubmitionAfterStop) {
 
     ASSERT_THROW({
         worker.submit([] {
-            std::this_thread::sleep_for(1s);
         });
     }, std::runtime_error);
 }

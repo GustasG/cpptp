@@ -10,6 +10,8 @@
 #include <type_traits>
 #include <condition_variable>
 
+#include <blockingconcurrentqueue.h>
+
 namespace cpptp
 {
     class Worker
@@ -51,6 +53,11 @@ namespace cpptp
         [[nodiscard]] size_type pending_task_count() const;
 
         /**
+        * Wait until all pending tasks are executed
+        */
+        void wait();
+
+        /**
          * Submits the given callable with arguments to the work queue.
          * All arguments will be copied to and forwarded to provided callable.
          * If returned future does not require waiting, more effective strategy will be calling execute method with the same arguments
@@ -68,9 +75,7 @@ namespace cpptp
 
             if (!stopped())
             {
-                std::unique_lock l(m_Mutex);
-
-                m_Tasks.emplace([=, task_args = std::move(task_args)] () mutable {
+                m_Tasks.enqueue([=, task_args = std::move(task_args)] () mutable {
                     std::apply(*task, task_args);
                 });
             }
@@ -80,7 +85,6 @@ namespace cpptp
                 throw std::runtime_error("Worker instance has been stopped");
             }
 #endif
-            m_ConditionVariable.notify_all();
             return task->get_future();
         }
 
@@ -96,14 +100,13 @@ namespace cpptp
         template<class F, class... Args>
         void execute(F&& fn, Args&&... args)
         {
+
             auto task = fn;
             auto task_args = std::make_tuple(std::forward<Args>(args)...);
 
             if (!stopped())
             {
-                std::unique_lock l(m_Mutex);
-
-                m_Tasks.emplace([task = std::move(task), task_args = std::move(task_args)] () mutable {
+                m_Tasks.enqueue([task = std::move(task), task_args = std::move(task_args)] () mutable {
                     try
                     {
                         std::apply(task, task_args);
@@ -118,13 +121,12 @@ namespace cpptp
                 throw std::runtime_error("Worker instance has been stopped");
             }
 #endif
-            m_ConditionVariable.notify_all();
         }
 
     private:
-        mutable std::mutex m_Mutex;
-        std::condition_variable m_ConditionVariable;
-        std::queue<task_type> m_Tasks;
+        std::mutex m_WaitingMutex;
+        std::condition_variable m_WaitingCv;
+        moodycamel::BlockingConcurrentQueue<task_type> m_Tasks;
         std::thread m_WorkerThread;
         std::atomic<bool> m_Stopped;
     };

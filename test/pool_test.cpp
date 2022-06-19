@@ -39,7 +39,7 @@ TEST(PoolTest, UsePoolsWorkerExplicityly) {
         id2 = std::this_thread::get_id();
     });
 
-    std::this_thread::sleep_for(2s);
+    worker->wait();
 
     ASSERT_EQ(id1, id2);
 }
@@ -53,7 +53,6 @@ TEST(PoolTest, CheckingPendingTasksInsideEmptyPool) {
 TEST(PoolTest, SubmitingGivenTaskToPool) {
     cpptp::ThreadPool pool;
     auto future = pool.submit([] {
-        std::this_thread::sleep_for(1s);
         return 50;
     });
 

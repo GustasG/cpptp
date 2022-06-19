@@ -52,6 +52,14 @@ namespace cpptp
         }
     }
 
+    void ThreadPool::wait()
+    {
+        for (auto& worker : m_Workers)
+        {
+            worker->wait();
+        }
+    }
+
     std::shared_ptr<Worker> ThreadPool::acquire_worker()
     {
         auto index = m_Count.fetch_add(1, std::memory_order_relaxed) % worker_count();

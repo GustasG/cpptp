@@ -49,6 +49,11 @@ namespace cpptp
         void stop() noexcept;
 
         /**
+        * Wait until all workers have their tasks executed
+        */
+        void wait();
+
+        /**
          * Explicitly acquire worker from poll.
          * Useful if certain tasks are required to execute on the same thread
          * @return Existing worker instance from pool
