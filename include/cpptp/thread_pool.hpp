@@ -31,28 +31,22 @@ namespace cpptp
 
     public:
         /**
-         * Method used to view how many workers are used for work.
+         * Method used to view how many worker_count are used for work.
          * Worker count will be the same as provided thread count in class constructor.
          * @return Number of worker threads in this pool
          */
-        [[nodiscard]] size_type workers() const noexcept;
+        [[nodiscard]] size_type worker_count() const noexcept;
 
         /**
-         * Retrieves approximate number of tasks that workers have remaining
+         * Retrieves approximate number of tasks that worker_count have remaining
          * @return Approximate result of pending tasks
          */
-        [[nodiscard]] size_type pending_tasks() const;
+        [[nodiscard]] size_type pending_task_count() const;
 
         /**
-         * Forces all workers to deny new tasks and finish with pending ones
+         * Forces all worker_count to deny new tasks and finish with pending ones
          */
         void stop() noexcept;
-
-        /**
-         * Blocks until there are no more tasks waiting to be executed for all workers.
-         * Use this method only if other threads cannot add more tasks
-         */
-        void await();
 
         /**
          * Explicitly acquire worker from poll.
@@ -74,7 +68,7 @@ namespace cpptp
         template<class F, class... Args>
         std::future<std::invoke_result_t<F, Args...>> submit(F&& fn, Args&&... args)
         {
-            auto index = m_Count.fetch_add(1, std::memory_order_relaxed) % workers();
+            auto index = m_Count.fetch_add(1, std::memory_order_relaxed) % worker_count();
 
             return m_Workers[index]->submit(std::forward<F>(fn), std::forward<Args>(args)...);
         }
@@ -91,24 +85,9 @@ namespace cpptp
         template<class F, class... Args>
         void execute(F&& fn, Args&&... args)
         {
-            auto index = m_Count.fetch_add(1, std::memory_order_relaxed) % workers();
+            auto index = m_Count.fetch_add(1, std::memory_order_relaxed) % worker_count();
 
             m_Workers[index]->execute(std::forward<F>(fn), std::forward<Args>(args)...);
-        }
-
-        /**
-         * Applies the given function in separate threads to the result of dereferencing every iterator in range [first, last).
-         * @param first First iterator in range
-         * @param last Last iterator in range
-         * @param fn Function object for which to apply dereferenced values from range [first, last)
-         */
-        template<class InputIt, class UnaryFunction>
-        void for_each(InputIt first, InputIt last, UnaryFunction fn)
-        {
-            for (; first != last; ++first)
-            {
-                execute(fn, std::ref(*first));
-            }
         }
 
     private:

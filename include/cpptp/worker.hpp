@@ -48,13 +48,7 @@ namespace cpptp
          * Retrieves approximate number of tasks that worker has remaining
          * @return Approximate number of tasks in queue
          */
-        [[nodiscard]] size_type pending_tasks() const;
-
-        /**
-         * Blocks until worker finished all pending tasks.
-         * Use this method only if other threads cannot add more tasks
-         */
-        void await();
+        [[nodiscard]] size_type pending_task_count() const;
 
         /**
          * Submits the given callable with arguments to the work queue.
@@ -70,14 +64,14 @@ namespace cpptp
         std::future<std::invoke_result_t<F, Args...>> submit(F&& fn, Args&&... args)
         {
             auto task = std::make_shared<std::packaged_task<std::invoke_result_t<F, Args...>(Args...)>>(std::forward<F>(fn));
+            auto task_args = std::make_tuple(std::forward<Args>(args)...);
 
             if (!stopped())
             {
                 std::unique_lock l(m_Mutex);
 
-                m_Tasks.emplace([=] {
-                    auto fn_args = std::make_tuple(args...);
-                    std::apply(*task, fn_args);
+                m_Tasks.emplace([=, task_args = std::move(task_args)] () mutable {
+                    std::apply(*task, task_args);
                 });
             }
 #if !defined(CPPTP_DISABLE_EXCEPTIONS)
@@ -102,21 +96,21 @@ namespace cpptp
         template<class F, class... Args>
         void execute(F&& fn, Args&&... args)
         {
-            auto task = [=] {
-                try
-                {
-                    auto fn_args = std::make_tuple(args...);
-                    std::apply(fn, fn_args);
-                } catch (...)
-                {
-                }
-            };
+            auto task = fn;
+            auto task_args = std::make_tuple(std::forward<Args>(args)...);
 
             if (!stopped())
             {
                 std::unique_lock l(m_Mutex);
 
-                m_Tasks.emplace(task);
+                m_Tasks.emplace([task = std::move(task), task_args = std::move(task_args)] () mutable {
+                    try
+                    {
+                        std::apply(task, task_args);
+                    } catch (...)
+                    {
+                    }
+                });
             }
 #if !defined(CPPTP_DISABLE_EXCEPTIONS)
             else

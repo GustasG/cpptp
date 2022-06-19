@@ -27,18 +27,19 @@ namespace cpptp
     {
     }
 
-    ThreadPool::size_type ThreadPool::workers() const noexcept
+    ThreadPool::size_type ThreadPool::worker_count() const noexcept
     {
         return m_Workers.size();
     }
 
-    ThreadPool::size_type ThreadPool::pending_tasks() const
+    ThreadPool::size_type ThreadPool::pending_task_count() const
     {
         size_type pending = 0;
 
         for (const auto& worker : m_Workers)
         {
-            pending += worker->pending_tasks();
+            pending +=
+                worker->pending_task_count();
         }
 
         return pending;
@@ -52,17 +53,9 @@ namespace cpptp
         }
     }
 
-    void ThreadPool::await()
-    {
-        for (auto& worker : m_Workers)
-        {
-            worker->await();
-        }
-    }
-
     std::shared_ptr<Worker> ThreadPool::acquire_worker()
     {
-        auto index = m_Count.fetch_add(1, std::memory_order_relaxed) % workers();
+        auto index = m_Count.fetch_add(1, std::memory_order_relaxed) % worker_count();
 
         return m_Workers[index];
     }

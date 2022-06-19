@@ -48,17 +48,9 @@ namespace cpptp
         return m_Stopped.load(std::memory_order_relaxed);
     }
 
-    Worker::size_type Worker::pending_tasks() const
+    Worker::size_type Worker::pending_task_count() const
     {
         std::lock_guard l(m_Mutex);
         return m_Tasks.size();
-    }
-
-    void Worker::await()
-    {
-        std::unique_lock l(m_Mutex);
-        m_ConditionVariable.wait(l, [this] {
-            return m_Tasks.empty();
-        });
     }
 } // namespace cpptp

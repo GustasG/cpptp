@@ -1,8 +1,11 @@
 #include <exception>
+#include <chrono>
 
 #include <gtest/gtest.h>
 
 #include <cpptp/worker.hpp>
+
+using namespace std::literals::chrono_literals;
 
 TEST(WorkerTest, BasicWorkerCreationTest) {
     EXPECT_NO_THROW({
@@ -18,7 +21,7 @@ TEST(WorkerTest, WorkerExecutionTest) {
         value -= 10;
     });
 
-    worker.await();
+    while (worker.pending_task_count() != 0);
 
     ASSERT_EQ(value, 40);
 }
@@ -30,9 +33,9 @@ TEST(WorkerTest, WorkerExecutionTestThatThrowsException) {
         worker.execute([]{
             throw std::runtime_error("Example exception");
         });
-
-        worker.await();
     });
+
+    std::this_thread::sleep_for(1s);
 }
 
 TEST(WorkerTest, WorkerExecutionAfterStop) {
@@ -41,7 +44,7 @@ TEST(WorkerTest, WorkerExecutionAfterStop) {
 
     ASSERT_THROW({
         worker.execute([] {
-            std::this_thread::sleep_for(std::chrono::seconds(1));
+            std::this_thread::sleep_for(1s);
         });
     }, std::runtime_error);
 }
@@ -65,20 +68,32 @@ TEST(WorkerTest, WorkerSubmitionAndPendingTasksRetrieval) {
 
     future.get();
 
-    ASSERT_EQ(worker.pending_tasks(), 0);
+    ASSERT_EQ(worker.pending_task_count(), 0);
 }
 
 TEST(WorkerTest, WorkerSubmitionWithClassInstance) {
     struct Foo
     {
+        Foo()
+            : value(42)
+        {
+        }
+
+        Foo(int value)
+            : value(value)
+        {
+        }
+
         int bar()
         {
-            return 50;
+            return value;
         }
+
+        int value;
     };
 
     cpptp::Worker worker;
-    Foo f;
+    Foo f(50);
 
     auto future = worker.submit(&Foo::bar, &f);
 
@@ -91,7 +106,7 @@ TEST(WorkerTest, WorkerSubmitionAfterStop) {
 
     ASSERT_THROW({
         worker.submit([] {
-            std::this_thread::sleep_for(std::chrono::seconds(1));
+            std::this_thread::sleep_for(1s);
         });
     }, std::runtime_error);
 }
