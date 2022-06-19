@@ -1,11 +1,12 @@
-#include <exception>
 #include <chrono>
+#include <exception>
 
 #include <gtest/gtest.h>
 
 #include <cpptp/thread_pool.hpp>
 
 using namespace std::literals::chrono_literals;
+
 
 TEST(PoolTest, CreatingPoolWithAvailableProcessorCount) {
     cpptp::ThreadPool pool;
@@ -30,15 +31,15 @@ TEST(PoolTest, UsePoolsWorkerExplicityly) {
     auto worker = pool.acquire_worker();
     std::thread::id id1, id2;
 
-    worker->execute([&]{
+    worker->execute([&] {
         id1 = std::this_thread::get_id();
     });
 
-    worker->execute([&]{
+    worker->execute([&] {
         id2 = std::this_thread::get_id();
     });
 
-    while (worker->pending_task_count() != 0);
+    std::this_thread::sleep_for(2s);
 
     ASSERT_EQ(id1, id2);
 }

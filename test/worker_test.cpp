@@ -17,11 +17,11 @@ TEST(WorkerTest, WorkerExecutionTest) {
     cpptp::Worker worker;
     int value = 50;
 
-    worker.execute([&]{
+    worker.execute([&] {
         value -= 10;
     });
 
-    while (worker.pending_task_count() != 0);
+    std::this_thread::sleep_for(2s);
 
     ASSERT_EQ(value, 40);
 }
@@ -63,7 +63,7 @@ TEST(WorkerTest, WorkerSubmitionAndPendingTasksRetrieval) {
     cpptp::Worker worker;
 
     auto future = worker.submit([] {
-        std::this_thread::sleep_for(std::chrono::seconds(1));
+        std::this_thread::sleep_for(1s);
     });
 
     future.get();
