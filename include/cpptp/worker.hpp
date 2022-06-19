@@ -75,11 +75,14 @@ namespace cpptp
 
             if (!stopped())
             {
-                m_Tasks.enqueue([=, task_args = std::move(task_args)] () mutable {
+                bool success = m_Tasks.enqueue([=, task_args = std::move(task_args)] () mutable {
                     std::apply(*task, task_args);
                 });
 
-                m_Consumed.fetch_add(1, std::memory_order_release);
+                if (success)
+                {
+                    m_RemainingTasks.fetch_add(1, std::memory_order_relaxed);
+                }
             }
 #if !defined(CPPTP_DISABLE_EXCEPTIONS)
             else
@@ -102,13 +105,12 @@ namespace cpptp
         template<class F, class... Args>
         void execute(F&& fn, Args&&... args)
         {
-
-            auto task = fn;
-            auto task_args = std::make_tuple(std::forward<Args>(args)...);
-
             if (!stopped())
             {
-                m_Tasks.enqueue([task = std::move(task), task_args = std::move(task_args)] () mutable {
+                auto task = fn;
+                auto task_args = std::make_tuple(std::forward<Args>(args)...);
+
+                bool success = m_Tasks.enqueue([task = std::move(task), task_args = std::move(task_args)] () mutable {
                     try
                     {
                         std::apply(task, task_args);
@@ -117,7 +119,10 @@ namespace cpptp
                     }
                 });
 
-                m_Consumed.fetch_add(1, std::memory_order_release);
+                if (success)
+                {
+                    m_RemainingTasks.fetch_add(1, std::memory_order_relaxed);
+                }
             }
 #if !defined(CPPTP_DISABLE_EXCEPTIONS)
             else
@@ -132,7 +137,7 @@ namespace cpptp
         std::condition_variable m_WaitingCv;
         moodycamel::BlockingConcurrentQueue<task_type> m_Tasks;
         std::thread m_WorkerThread;
-        std::atomic<size_type> m_Consumed;
+        std::atomic<int64_t> m_RemainingTasks;
         std::atomic<bool> m_Stopped;
     };
 } // namespace cpptp

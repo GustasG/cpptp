@@ -2,21 +2,22 @@
 
 namespace cpptp
 {
-    static void dummy_task()
+    static void end_task()
     {
     }
 
     Worker::Worker()
-        : m_Stopped(false), m_Consumed(0)
+        : m_Stopped(false), m_RemainingTasks(0)
     {
         m_WorkerThread = std::thread([this] {
-            while (!stopped() || pending_task_count() != 0)
+            while (!stopped() || pending_task_count() > 0)
             {
                 task_type task;
-                m_Tasks.wait_dequeue(task);
 
+                m_Tasks.wait_dequeue(task);
                 task();
-                m_Consumed.fetch_sub(1, std::memory_order_acq_rel);
+
+                m_RemainingTasks.fetch_sub(1, std::memory_order_acq_rel);
                 m_WaitingCv.notify_all();
             }
         });
@@ -25,7 +26,12 @@ namespace cpptp
     Worker::~Worker()
     {
         stop();
-        m_Tasks.enqueue(dummy_task);
+
+        if (m_Tasks.enqueue(end_task))
+        {
+            m_RemainingTasks.fetch_add(1, std::memory_order_relaxed);
+        }
+       
         m_WorkerThread.join();
     }
 
@@ -48,7 +54,7 @@ namespace cpptp
     {
         std::unique_lock l(m_WaitingMutex);
         m_WaitingCv.wait(l, [this] {
-            return m_Consumed.load(std::memory_order_acquire) == 0;
+            return m_RemainingTasks.load(std::memory_order_acquire) <= 0;
         });
     }
 } // namespace cpptp
