@@ -26,7 +26,6 @@ namespace cpptp
                 }
 
                 task();
-                m_ConditionVariable.notify_all();
             }
         });
     }
