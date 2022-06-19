@@ -44,7 +44,7 @@ namespace cpptp
 
     bool Worker::stopped() const noexcept
     {
-        return m_Stopped.load(std::memory_order_relaxed);
+        return m_Stopped.load(std::memory_order_acquire);
     }
 
     Worker::size_type Worker::pending_task_count() const
